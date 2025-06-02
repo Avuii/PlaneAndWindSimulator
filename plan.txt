@@ -1,0 +1,12 @@
+===================== Flight plan (no wind) =====================
+Departure
+lat:	  20.0		lon:	  20.0		time: 1.53 h
+
+Tower 1
+lat:	 30.00		lon:	 25.00		time: 2.14 h
+
+Tower 2
+lat:	 42.00		lon:	 37.00		time: 2.57 h
+
+Arrive
+lat:	 60.00		lon:	 30.00		time: 2.57 h

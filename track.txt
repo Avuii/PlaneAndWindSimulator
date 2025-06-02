@@ -1,0 +1,11 @@
+Departure
+lat:   20.0		lon:    20.0
+
+Tower 1
+lat:    30.0	lon:    25.0
+
+Tower 2
+lat:    42.0	lon:    37.0
+
+Arrive 
+lat:	60.0	lon:    30.0

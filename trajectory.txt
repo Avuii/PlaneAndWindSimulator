@@ -1,0 +1,12 @@
+===================== Trajectory (with wind) =====================
+Departure
+lat:	  20.0		lon:	  20.0		cor. time: 1.63 h
+
+Tower 1
+lat:	 30.00		lon:	 25.00		cor. time: 2.13 h
+
+Tower 2
+lat:	 42.00		lon:	 37.00		cor. time: 3.32 h
+
+Arrive
+lat:	 60.00		lon:	 30.00		cor. time: 3.32 h
