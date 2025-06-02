@@ -1,48 +1,3 @@
-// Wzór:
-// V(r) = A * (e/B) * r * e^(-r/B)
-// A - max wartosc wiatru
-// B -r, dla którego mamy A
-// e - liczba Eulera
-// r - odległość od 0°
-
-//      >  Trzeba zrobić siatke dla wiatru, gdzie bedziemy co 0.5° obliczać dla każdego oczka wektor wiatru.           +
-//         Wymiary siatki Ny=|y(d2) - y(d1)|, Nx=|x(d2) - x(d1)|
-//      >  Bedzie tez funckcja losujaca gdzies na siatce Niż albo Wyż, dzięki czemu będziemy znać kierunek wektorów.   +
-//      >  Używając f. Eulera obliczyć wartosci wektorów. Dane wektorów przechowywujemy w tablicy dwuwymiarowej.       +
-//      >  Jak dodawać wektory: Vwiatru + Vsamolotu
-/*
-Konwersja stopni na radiany
-double deg2rad(double degrees) {return degrees * M_PI / 180.0;}
-
-Struktura wektora z długością i kątem
-struct Vector {
-    double magnitude;
-    double angle_deg; // w stopniach
-};
-
-Dodawanie wektorów z zachowaniem kierunku większego
-Vector addPreservingDirection(const Vector& a, const Vector& b)
-{
-Ustal który wektor jest większy
-    const Vector& main = (a.magnitude >= b.magnitude) ? a : b;
-    const Vector& other = (a.magnitude >= b.magnitude) ? b : a;
-
-Różnica kątów (w radianach)
-    double delta_angle = deg2rad(other.angle_deg - main.angle_deg);
-
-Oblicz rzut wektora "other" na kierunek "main"
-    double projection = other.magnitude * std::cos(delta_angle);
-
-Dodaj rzut do długości wektora "main"
-    double result_magnitude = main.magnitude + projection;
-
-    return {result_magnitude, main.angle_deg};
-}
- */
-//      >  Dane bedą wczytywane z pliku tekstowego.                                 `                                  +
-//              track.txt -input,  odczytac segmentami po dwa punkty
-//              plan.txt - output z obliczeń bez uwzglednienia wektorów wiatrów,
-//              trajectory - output z uwzglednieniem wektorów wiatrów i zkorygowanymi  wartosciami
 
 #include "header.h"
 #include <fstream>
@@ -51,6 +6,7 @@ Dodaj rzut do długości wektora "main"
 #include <list>
 #include <string>
 #include <random>
+#include <cmath>
 #include <iomanip>
 #include <algorithm>
 
