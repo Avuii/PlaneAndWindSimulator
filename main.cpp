@@ -12,14 +12,14 @@
 
 using namespace std;
 
-// Funkcje pomocnicze
+// help fun
 double degToRad(double deg) {return deg * M_PI / 180.0;}
 
 double distanceBetweenPoints(double lat1, double lon1, double lat2, double lon2)
 {
-    /*użyjemy wzór Haversine'a, który uwzględnia kulisty kształt Ziemi.
-    a - pośrednia wartość zależna od różnic współrzędnych geograficznych.
-    c -kąt centralny pomiędzy dwoma punktami na sferze.
+/* We'll use the Haversine formula, which takes into account the spherical shape of the Earth.
+    a - an intermediate value depending on the differences in geographical coordinates.
+    c - the central angle between two points on the sphere.
         dlat = lat2 - lat1
         dlon = lon2 - lon1
         a = sin²(dlat / 2) + cos(lat1) * cos(lat2) * sin²(dlon / 2)
@@ -34,7 +34,7 @@ double distanceBetweenPoints(double lat1, double lon1, double lat2, double lon2)
 
     double a = sin(dlat/2)*sin(dlat/2) + cos(lat1)*cos(lat2)*sin(dlon/2)*sin(dlon/2);
     double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-    return R * c;  //długość łuku na sferze o promieniu R
+    return R * c;  // length of the arc on a sphere with radius R
 }
 
 double distanceOfSegment(const Segment& segment) {
@@ -46,13 +46,13 @@ WindSimulator::WindSimulator(double x1_, double x2_, int Nx_, double y1_, double
     : x1(x1_), x2(x2_), Nx(Nx_), y1(y1_), y2(y2_), Ny(Ny_) { }
 
 void WindSimulator::setRandomCenter() {
-    random_device rd;                               //losowy seed
-    mt19937 gen(rd());                           //Mersenne Twister – wydajny generator liczb pseudolosowych
-    uniform_real_distribution<> distX(x1, x2);  //rozkład jednostajny dla współrzędnej x z przedziału [x1, x2].
-    uniform_real_distribution<> distY(y1, y2);  //rozkład jednostajny dla współrzędnej y z przedziału [y1, y2].
-    uniform_int_distribution<> distType(0, 1);  //losuje typ centrum - wyż czy niż
+	random_device rd;                               // random seed
+	mt19937 gen(rd());                              // Mersenne Twister – efficient pseudorandom number generator
+	uniform_real_distribution<> distX(x1, x2);      // uniform distribution for x-coordinate in the range [x1, x2]
+	uniform_real_distribution<> distY(y1, y2);      // uniform distribution for y-coordinate in the range [y1, y2]
+	uniform_int_distribution<> distType(0, 1);      // randomly selects the center type – high or low pressure
 
-    //xc i yc są współrzędnymi losowo wybranego punktu wewnątrz prostokąta określonego przez rogi (x1, y1) i (x2, y2).
+    // xc and yc are the coordinates of a randomly selected point inside the rectangle defined by the corners (x1, y1) and (x2, y2).
     xc = distX(gen);
     yc = distY(gen);
 
@@ -82,15 +82,15 @@ void WindSimulator::generatorWindGrind() {
 
             double V = A * (exp(1.0) / B) * r * exp(-r / B);
 
-            // Arcus tangens – obliczanie kąta
-            double angle_rad = atan2(dy, dx);
-            //Obrót kąta o ±90°
-            //  jesli niż to wiatr kręci się przeciwnie do ruchu wskazówek zegara
-            //  jesli wyż to zgodnie z ruchem wskazówek zegara
-            if (low) angle_rad += M_PI / 2;
-            else angle_rad -= M_PI / 2;
+            // Arctan – calculating the angle
+			double angle_rad = atan2(dy, dx);
+			// Rotate the angle by ±90°
+			//   if it's a low-pressure center, the wind rotates counterclockwise
+			//   if it's a high-pressure center, it rotates clockwise
+			if (low) angle_rad += M_PI / 2;
+			else angle_rad -= M_PI / 2;
 
-            //Rzutowanie prędkości na osie:
+           // Projecting the velocity onto the axes:
             double vx = V * cos(angle_rad);
             double vy = V * sin(angle_rad);
 
@@ -102,7 +102,8 @@ void WindSimulator::generatorWindGrind() {
 void WindSimulator::writeWindGrind(ostream &out) const {
     double deltaX = (x2 - x1) / (Nx - 1);
     double deltaY = (y2 - y1) / (Ny - 1);
-//Grid(lon,lat): Vx([-zachód, +wschód ]), Vy ([-południe, +północ])
+
+	// Grid(lon, lat): Vx ([-west, +east]), Vy ([-south, +north])
     out << "Wind field grid (" << Nx << " x " << Ny << ") centered at ("<< fixed << setprecision(2) << xc << ", " << yc << ")\n";
     out << "Grid resolution: Δlon = " << deltaX << "°, Δlat = " << deltaY << "°\n\n\n";
 
@@ -116,7 +117,7 @@ void WindSimulator::writeWindGrind(ostream &out) const {
             double angle_deg = atan2(wind.vx, wind.vy) * 180.0 / M_PI;
             if (angle_deg < 0) angle_deg += 360.0;
 
-            // Określenie kierunku tekstowego (8 kierunków)
+           // Determining the textual direction (8 compass directions)
             string direction;
             if (angle_deg >= 337.5 || angle_deg < 22.5) direction = "N";
             else if (angle_deg < 67.5) direction = "NE";
@@ -133,7 +134,7 @@ void WindSimulator::writeWindGrind(ostream &out) const {
                 << "  | Speed = " << setw(8) << setprecision(3) << speed
                 << "  Dir = " << direction << "\n";
         }
-        out << "\n\n";// oddziela wiersze siatki (Nx punktów na tej samej szerokości geograficznej (lat))
+        out << "\n\n";// separates grid rows (Nx points at the same latitude)
     }
 }
 
@@ -143,7 +144,7 @@ void WindSimulator::writeWindGridCSV(std::ostream &out) const {
 
     out << std::fixed << std::setprecision(2);
 
-    // Nagłówek: pusta komórka, potem wartości y (szerokość geograficzna) w kolumnach
+   // Header: empty cell, then y values (latitude) in columns
     out << "x/y";
     for (int j = Ny - 1; j >= 0; --j) {
         double y = y1 + deltaY * j;
@@ -151,7 +152,7 @@ void WindSimulator::writeWindGridCSV(std::ostream &out) const {
     }
     out << "\n";
 
-    // Teraz wiersze: każdy x i odpowiednie wartości dla różnych y
+// Now the rows: each x and corresponding values for different y
     for (int i = 0; i < Nx; ++i) {
         double x = x1 + deltaX * i;
         out << x;
@@ -188,13 +189,13 @@ Vector WindSimulator::getWind(double x, double y) const {
 
 //-Airplane-------------------------------------------------------------------------------------------------------------
 
-// funkcja do konwersji kierunku i prędkości w wektora
+// function to convert direction and speed into a vector
 Vector directionSpeedToVector(double speed, double angle_deg) {
     double angle_rad = angle_deg * M_PI / 180.0;
     return Vector(speed * cos(angle_rad), speed * sin(angle_rad));
 }
 
-// funkcja do sumowania prędkości samolotu i wiatru z zachowaniem kierunku lotu
+// function to sum the airplane's speed and wind speed while preserving the flight direction
 Vector addPreservingDirection(const Vector& planeVec, const Vector& windVec) {
     return Vector(planeVec.vx + windVec.vx, planeVec.vy + windVec.vy);
 }
@@ -224,35 +225,35 @@ void Airplane::computeTimeWithWind(list<Segment>& segments, const WindSimulator&
 cout << "                           WIND                        \n\n";
 
     for (auto& seg : segments) {
-        // Środek segmentu (lat, lon)
+       // Midpoint of the segment (lat, lon)
         double midLat = (seg.from.lat + seg.to.lat) / 2.0;
         double midLon = (seg.from.lon + seg.to.lon) / 2.0;
 
         Vector wind = windSim.getWind(midLon, midLat);
 
-        // Kierunek lotu w radianach
+       // Flight direction in radians
         double dx = seg.to.lon - seg.from.lon;
         double dy = seg.to.lat - seg.from.lat;
         double angle_rad = atan2(dy, dx);
 
-        // Wektor prędkości samolotu (vx, vy)
+   		// Airplane velocity vector (vx, vy)
         Vector planeVec{
             planeSpeed * cos(angle_rad),
             planeSpeed * sin(angle_rad)
         };
 
-        // Suma wektorów (prędkość samolotu + wiatr)
+      // Sum of vectors (airplane velocity + wind)
         Vector corrected{
             planeVec.vx + wind.vx,
             planeVec.vy + wind.vy
         };
 
-        // Projeksja skorygowanej prędkości na kierunek lotu (skalarny iloczyn)
+     	// Projection of the corrected velocity onto the flight direction (scalar product)
         double correctedSpeedAlongRoute = (corrected.vx * cos(angle_rad)) + (corrected.vy * sin(angle_rad));
 
         if (correctedSpeedAlongRoute <= 0) {
-            // Wiatr powoduje, że samolot "stoi w miejscu" lub cofa się,
-            // ustaw minimalną prędkość by uniknąć dzielenia przez zero lub negatywnego czasu
+           	// Wind causes the airplane to "stand still" or move backward,
+			// set a minimum speed to avoid division by zero or negative time
             correctedSpeedAlongRoute = 1.0;
         }
 
@@ -275,7 +276,7 @@ cout << "                           WIND                        \n\n";
 }
 
 
-// Wczytywanie track.txt
+// loading track.txt
 vector<Waypoint> readTrackFile(const string& filename) {
     vector<Waypoint> points;
     ifstream infile(filename);
@@ -334,7 +335,7 @@ void writeData::writePlan(ostream& out, const list<Segment>& segments) const {
             << "\t\ttime: " << setprecision(2) << it->time_no_wind << " h\n\n";
     }
 
-    // Dodaj ostatni punkt (Arrive)
+    // add last point (Arrive)
     const Waypoint& wp = segments.back().to;
     out << wp.name << "\n";
     out << "lat:\t" << setw(6) << wp.lat << "\t\tlon:\t" << setw(6) << wp.lon
@@ -353,7 +354,7 @@ void writeData::writeTrajectory(ostream& out, const list<Segment>& segments) con
             << "\t\tcor. time: " << setprecision(2) << it->time_with_wind << " h\n\n";
     }
 
-    // Dodaj ostatni punkt (Arrive)
+    // add last point (Arrive)
     const Waypoint& wp = segments.back().to;
     out << wp.name << "\n";
     out << "lat:\t" << setw(6) << wp.lat << "\t\tlon:\t" << setw(6) << wp.lon
@@ -373,7 +374,7 @@ int main() {
     string csvWindFile = "wind.csv";
     try {
 
-        // Ustawienia gridu
+        // grid settings
         double x1 = 0.0, x2 = 90.0;
         int Nx = 90;
         double y1 = 0.0, y2 = 90.0;

@@ -10,11 +10,11 @@
 using namespace std;
 
 struct Vector {
-    double vx = 0.0, vy = 0.0; // składowe prędkości wiatru (wschód, północ)
+    double vx = 0.0, vy = 0.0; // wind velocity components (east, north)
 
     Vector(double vx = 0.0, double vy = 0.0) : vx(vx), vy(vy) {}
 
-    // Dodawanie wektorów z zachowaniem kierunku (przyda się w Airplane)
+    // Adding vectors while preserving direction (useful in Airplane)
     double magnitude() const {
         return sqrt(vx*vx + vy*vy);
     }
@@ -28,10 +28,10 @@ class WindSimulator {
 private:
     double x1, x2, y1, y2;
     int Nx, Ny;
-    double A = 200.0; // max prędkość wiatru
+    double A = 200.0; // max wind velocity
     double B = 30.0;
-    bool high = false; // wyż
-    bool low = false;  // niż
+    bool high = false;
+    bool low = false;
     double xc = 0, yc = 0;
     vector<vector<Vector>> windGrid;
 
@@ -60,7 +60,7 @@ struct Segment {
     double time_with_wind = 0.0;
 };
 
-// Prototypy funkcji pomocniczych
+// help fun
 double degToRad(double deg);
 double distanceBetweenPoints(double lat1, double lon1, double lat2, double lon2);
 double distanceOfSegment(const Segment& segment);
